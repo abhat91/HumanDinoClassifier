@@ -40,6 +40,6 @@ Our initial software will have 5 parts:
  - Shape Representation, Configuration = Peng
  - Shape Matching = Joe
 
- # Future Possibilities
+# Future Possibilities
  - Take webcam as input
  - Write OpenCV methods/functions ourselves
