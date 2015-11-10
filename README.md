@@ -21,6 +21,8 @@ Our initial software will have 5 parts:
   - Output: Three percentages
 - Output
   - Overlay three percentages and some text on the Original Image
+   
+  
 # Strategy 2
 Since the chain code is not invariant on scaling, we will try two solutions: Blobdetect and Keypoint&Feature Vector detect.
 At this time, we simplifiy the problem set to "Detect the objects, which we already have in the database, in a query image and show the reasults with highlighted contours of the objects."
