@@ -10,6 +10,7 @@ ret,thresh = cv2.threshold(imgray,127,255,0)
 # For example, an up-right rectangular contour is encoded with 4 points.
 # CHAIN_APPROX_NONE: stores absolutely all the contour points. That is, any 2 subsequent points (x1,y1) and (x2,y2) of
 # the contour will be either horizontal, \\\vertical or diagonal neighbors, that is, max(abs(x1-x2),abs(y2-y1))==1.
+# im2, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 im2, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
 
