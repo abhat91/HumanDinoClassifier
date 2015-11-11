@@ -2,10 +2,10 @@ import numpy as np
 import cv2
 
 class Matcher:
-    def __int__(self, descriptor, dataPaths, ratio = 0.7,
+    def __int__(self, descriptor, samplePaths, ratio = 0.7,
                 minMatches = 30, useHamming = True):
         self.descriptor = descriptor
-        self.dataPaths = dataPaths
+        self.samplePaths = samplePaths
         self.ratio = ratio
         self.minMatches = minMatches
         self.distanceMethod = "BruteForce"
@@ -17,13 +17,13 @@ class Matcher:
     def search(self, queryKps, queryDescs):
         results = {}
 
-        for dataPath in self.dataPaths:
-            obj = cv2.imread(dataPath)
+        for samplePath in self.samplePaths:
+            obj = cv2.imread(samplePath)
             gray = cv2.cvtColor(obj, cv2.COLOR_BGR2GRAY)
             (kps, descs) = self.descriptor.describe(gray)
 
             score = self.match(queryKps, queryDescs, kps, descs)
-            results[dataPath] = score
+            results[samplePath] = score
 
         if len(results) > 0:
             # sort the result for having the most possible match at the first
@@ -31,7 +31,7 @@ class Matcher:
 
         return results
 
-    # now match the query obj (B) with our database (A)
+    # now match the query obj (B) with our samplebase (A)
     def match(self, kpsA, featuresA, kpsB, featuresB):
         matcher = cv2.DescriptorMatcher_create(self.distanceMethod)
         rawMatches = matcher.knnMatch(featuresB, featuresA, 2)
@@ -39,13 +39,13 @@ class Matcher:
 
         for m in rawMatches:
             if len(m) == 2 and m[0].distance < m[1].distance * self.ratio:
-                matches.append(m[0].trainIdx, m[0].queryIdx)
+                matches.append(m[0].trainIdx, m[0].queryIdx) #be careful with the train/query orders, I'm not sure
 
         if len(matches) > self.minMatches:
             ptsA = np.float32([kpsA[i] for (i, _) in matches])
             ptsB = np.float32([kpsB[j] for (_, j) in matches])
             (_, status) = cv2.findHomography(ptsA, ptsB, cv2.RANSAC, 4.0)
 
-            return float(status,sum()) / status.size # matching ratio against the object in database
+            return float(status,sum()) / status.size # matching ratio against the object in samplebase
 
         return -1.0 # no possible match
