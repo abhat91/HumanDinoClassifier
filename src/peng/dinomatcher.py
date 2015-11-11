@@ -1,9 +1,8 @@
 import numpy as np
 import cv2
 
-class Matcher:
-    def __int__(self, descriptor, samplePaths, ratio = 0.7,
-                minMatches = 30, useHamming = True):
+class DinoMatcher:
+    def __init__(self, descriptor, samplePaths, ratio = 0.7, minMatches = 30, useHamming = True):
         self.descriptor = descriptor
         self.samplePaths = samplePaths
         self.ratio = ratio
@@ -11,7 +10,7 @@ class Matcher:
         self.distanceMethod = "BruteForce"
 
         if useHamming:
-            self.distanceMethod = "-Hamming"
+            self.distanceMethod += "-Hamming"
 
     # now search the thing
     def search(self, queryKps, queryDescs):
@@ -39,13 +38,13 @@ class Matcher:
 
         for m in rawMatches:
             if len(m) == 2 and m[0].distance < m[1].distance * self.ratio:
-                matches.append(m[0].trainIdx, m[0].queryIdx) #be careful with the train/query orders, I'm not sure
+                matches.append((m[0].trainIdx, m[0].queryIdx)) #be careful with the train/query orders, I'm not sure
 
         if len(matches) > self.minMatches:
             ptsA = np.float32([kpsA[i] for (i, _) in matches])
             ptsB = np.float32([kpsB[j] for (_, j) in matches])
             (_, status) = cv2.findHomography(ptsA, ptsB, cv2.RANSAC, 4.0)
 
-            return float(status,sum()) / status.size # matching ratio against the object in samplebase
+            return float(status.sum()) / status.size # matching ratio against the object in samplebase
 
         return -1.0 # no possible match
