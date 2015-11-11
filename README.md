@@ -21,6 +21,14 @@ Our initial software will have 5 parts:
   - Output: Three percentages
 - Output
   - Overlay three percentages and some text on the Original Image
+   
+  
+# Strategy 2
+Since the chain code is not invariant on scaling, we will try two solutions: Blobdetect and Keypoint&Feature Vector detect.
+At this time, we simplifiy the problem set to "Detect the objects, which we already have in the database, in a query image and show the reasults with highlighted contours of the objects."
+
+- Blob Detection uses the color channel of our dinosaours and we query the program with a simple background image.
+- Keypoint&Feature detection is more robust with complicated background and could work on humans as well. 
 
 # OpenCV functions
 - cvtcolor()
@@ -39,7 +47,12 @@ Our initial software will have 5 parts:
  - Edge Detection = Renato
  - Shape Representation, Configuration = Peng
  - Shape Matching = Joe
+ 
+Temp work:
+- Blob detection - Aditya
+- Keypoint&Feature detection - Peng
+ 
 
- # Future Possibilities
+# Future Possibilities
  - Take webcam as input
  - Write OpenCV methods/functions ourselves

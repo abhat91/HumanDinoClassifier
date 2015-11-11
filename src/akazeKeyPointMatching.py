@@ -3,7 +3,7 @@ from __future__ import print_function
 import cv2
  
 # load the image and convert it to grayscale
-image = cv2.imread("dino2.png")
+image = cv2.imread("../testImages/dino2.png")
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 cv2.imshow("Original", image)
  
