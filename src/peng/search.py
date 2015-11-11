@@ -19,3 +19,40 @@ database = {}
 for line in csv.reader(open(args["database"])):
     database[line[0]] = line[1:]
 
+useSIFT = args["sift"] > 0
+useHamming = args["shift"] == 0
+ratio = 0.7
+minMatches = 30
+
+if useSIFT:
+    minMatches = 50
+
+
+descriptor = Descriptor(useSIFT = useSIFT)
+matcher = Matcher(descriptor, glob.glob(args["samples"] + "/*.png"),
+                    ratio = ratio,
+                    minMatches = minMatches,
+                    useHamming = useHamming)
+
+queryImage = cv2.imread(args["query"])
+gray = cv2.cvtColor(queryImage, cv2.COLOR_BGR2GRAY)
+(queryKps, queryDescs) = descriptor.describe(gray)
+
+results = matcher.search(queryKps, queryDescs)
+
+cv2.imshow("Query", queryImage)
+
+if len(results) == 0:
+    print("no sample are matched to the query !")
+    cv2.waitKey(0)
+
+else:
+    for(i, (score, samplePath)) in enumerate(results):
+        description = database[samplePath[samplePath.rfind("/") + 1:]]
+        print("{}.{:.2f}% : {}".format(i + 1, score * 100, description))
+
+        results = cv2.imread(samplePath)
+        cv2.imshow("Matched Sample", results)
+        cv2.waitKey(0)
+
+
