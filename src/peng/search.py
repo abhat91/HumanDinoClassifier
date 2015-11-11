@@ -12,7 +12,7 @@ ap.add_argument("-s", "--samples", required = True, help = "path to the sample(t
 ap.add_argument("-q", "--query", required = True, help = "path to the query image")
 
 args = vars(ap.parse_args())
-ap.add_argument("-S", "--sift", type = int, default = 0, help = "use SIFT = 1, not use = 0")
+ap.add_argument("-f", "--sift", type = int, default = 0, help = "use SIFT = 1, not use = 0")
 
 database = {}
 
@@ -20,7 +20,7 @@ for line in csv.reader(open(args["database"])):
     database[line[0]] = line[1:]
 
 useSIFT = args["sift"] > 0
-useHamming = args["shift"] == 0
+useHamming = args["sift"] == 0
 ratio = 0.7
 minMatches = 30
 

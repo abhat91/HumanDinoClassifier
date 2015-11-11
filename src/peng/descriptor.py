@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 
 class Descriptor:
-    def __init__(self, useSIFT = false):
+    def __init__(self, useSIFT = False):
         self.useSIFT = useSIFT
 
     def describe(self, image):

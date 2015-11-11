@@ -4,3 +4,5 @@ src/peng/.idea/misc.xml
 src/peng/.idea/modules.xml
 src/peng/.idea/peng.iml
 src/peng/.idea/workspace.xml
+src/peng/descriptor.pyc
+src/peng/matcher.pyc
