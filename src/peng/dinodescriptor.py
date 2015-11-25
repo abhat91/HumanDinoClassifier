@@ -7,6 +7,7 @@ class DinoDescriptor:
 
     def describe(self, image):
         descriptor = cv2.BRISK_create() #we can use BRISK as well
+        # descriptor = cv2.AKAZE_create() #we can use BRISK as well
 
         if self.useSIFT:
             descriptor = cv2.xfeatures2d.SIFT_create()
