@@ -5,6 +5,14 @@ Based on the human pose, the algorithm picks out the dinosaur (By team Crocodile
 If you are using a MAC, you may follow this paper to get OpenCV3.0 and Python 2.7
 <http://www.pyimagesearch.com/2015/06/15/install-opencv-3-0-and-python-2-7-on-osx/>
 
+# How to run the program
+For the key pointe= searching run with terminal commands:
+```
+python search.py --db dinoDB.csv --samples samples --query queries/query5.png
+```
+- modify the query item to see different results
+- if you want use SIFT, simply append "--sift Ture" to the end
+
 # Strategy
 Our initial software will have 5 parts:
 - Object Recognition
