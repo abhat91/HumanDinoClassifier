@@ -1,17 +1,53 @@
-# HumanDinoClassifier
-Based on the human pose, the algorithm picks out the dinosaur (By team Crocodile)
+# HumanDinoClassifier by Team Crocodile
 
-# Computer Setup
-If you are using a MAC, you may follow this paper to get OpenCV3.0 and Python 2.7
-<http://www.pyimagesearch.com/2015/06/15/install-opencv-3-0-and-python-2-7-on-osx/>
+## Project Introduction
+The output we expect is that our program will tell us who is in the image and which dinosaur is in the image with a query image that contains no more than one person and one dinosaur.
 
-# How to run the program
-For the key pointe= searching run with terminal commands:
-```
-python search.py --db dinoDB.csv --samples samples --query queries/query5.png
-```
-- modify the query item to see different results
-- if you want use SIFT, simply append "--sift Ture" to the end
+## Project Classes
+The classes listed here are not limited to only one big class. They are representing some system boudoirs that have a clear cut. You should considering separate your portion of code into function blocks.
+
+We follow the **MVC design rule** and in this special CV program, our model will be images(trading and query), our controller will be classifiers, out view with be output handing class.
+
+##### Model
+1. Image taker
+	2. Have to output query image in **PNG** **PNG** **PNG** format!
+2. Image handler(if needed)
+
+##### View
+1. Results printer
+	2. should outputs “In this query image (No person/Peng/Aditya/Renato/Joe) is holding a (dinosaur/T-Rax1/T-Rax2/Fat-dino/Volcano)!
+2. Contour highlighter(phase 2)
+	3. Highlight the contour of human and dinosaur.
+	
+##### Controller
+1. Human classifier
+	2. input: a query inmage
+	3. output: (No person/Peng/Aditya/Renato/Joe) with in (running time) and (matching rate)%
+2. Dinosaur classifier
+	3. input: a query inmage
+	3. output: (dinosaur/T-Rax1/T-Rax2/Fat-dino/Volcano) with in (running time) and (matching rate)% 
+
+## Project Evaluation Criteria:
+- 20% Soundness of approach
+	- make sure the program not crashed 9/10 times.
+- 15% Justification
+	- make sure the program puts correct names on the queries.
+- 20% Analysis
+	- make sure the people understands your code
+- 15% Testing & examples
+	- throw in queries with scaling, rotation and 
+- 15% Documentation
+	- log all your works
+- 10% Presentation
+	- present order TBD
+- 5% Difficulty
+	- add complex BKG queries
+- Extra (up to 10%)
+	- recognize dinosaurs along with human who is hold it
+	
+
+
+-------------------------------------------------------- 
 
 # Strategy
 Our initial software will have 5 parts:
@@ -64,3 +100,7 @@ Temp work:
 # Future Possibilities
  - Take webcam as input
  - Write OpenCV methods/functions ourselves
+ 
+# Computer Setup
+If you are using a MAC, you may follow this paper to get OpenCV3.0 and Python 2.7
+<http://www.pyimagesearch.com/2015/06/15/install-opencv-3-0-and-python-2-7-on-osx/>
