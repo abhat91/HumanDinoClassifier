@@ -2,6 +2,7 @@ from __future__ import print_function
 from dinoDescriptor import DinoDescriptor
 from dinoMatcher import  DinoMatcher
 from dinoSegmenter2 import DinoSegmenter2
+import numpy as np
 import argparse
 import glob
 import csv
@@ -31,13 +32,8 @@ if useSIFT:
 
 inputImage=cv2.imread(args["query"])
 
-# cv2.imshow('Raw', inputImage)
-# cv2.waitKey(0)
-
-
 
 segmenter = DinoSegmenter2()
-segImage = segmenter.segmentImage(inputImage)
 # cv2.imshow('Segmented', segImage)
 # cv2.waitKey(0)
 
@@ -47,34 +43,40 @@ dinoMatcher = DinoMatcher(descriptor, glob.glob(args["samples"] + "/*.png"), rat
 # queryImage = cv2.imread(args["query"])
 
 # capture from webcam
-# cap = cv2.VideoCapture(0)
-# while(True):
-#     ret, queryImage = cap.read()
+cap = cv2.VideoCapture(0)
+while(True):
+    ret, inputImage = cap.read()
+    segImage = segmenter.segmentImage(inputImage)
+    (queryKps, queryDescs) = descriptor.describe(segImage)
+    # To  show the key points
+    KpImage = cv2.drawKeypoints(inputImage, descriptor.kpsRaw, None)
+    # cv2.waitKey(0)
+    cv2.imshow("Input with Key Points", KpImage)
 
-# gray = cv2.cvtColor(queryImage, cv2.COLOR_BGR2GRAY)
-(queryKps, queryDescs) = descriptor.describe(segImage)
-# To  show the key points
-KpImage = cv2.drawKeypoints(segImage, descriptor.kpsRaw, None)
-cv2.imshow("Query KP Image", KpImage)
-cv2.waitKey(0)
+    # cv2.waitKey(0)
+    # x = raw_input('press n to continue: ')
+    # if  x == 'n':
+    #     continue
+    # else:
+    #     break
 
-results = dinoMatcher.search(queryKps, queryDescs)
+    results = dinoMatcher.search(queryKps, queryDescs)
 
-cv2.imshow("Query", inputImage)
 
-if len(results) == 0:
-    print("no sample are matched to the query !")
-    cv2.waitKey(300)
+    if len(results) == 0:
+        print("no sample are matched to the query !")
+        cv2.waitKey(30)
 
-else:
-    for(i, (score, samplePath)) in enumerate(results):
-        description = db[samplePath[samplePath.rfind("/") + 1:]]
-        print("{}.{:.2f}% : {}".format(i + 1, score * 100, description))
+    else:
+        for(i, (score, samplePath)) in enumerate(results):
+            description = db[samplePath[samplePath.rfind("/") + 1:]]
+            print("{}.{:.2f}% : {}".format(i + 1, score * 100, description))
 
-        results = cv2.imread(samplePath)
-        cv2.imshow("Matched Sample", results)
+            results = cv2.imread(samplePath) # only show the highest matching image
+            cv2.imshow("Right: Matched Sample", results)
 
-cv2.waitKey(0)
+
+    # cv2.waitKey(0)
     # x = raw_input('press n to continue: ')
     # if  x == 'n':
     #     continue
