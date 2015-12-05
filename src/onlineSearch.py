@@ -1,12 +1,14 @@
 from __future__ import print_function
-from dinoDescriptor import DinoDescriptor
-from dinoMatcher import  DinoMatcher
-from dinoSegmenter2 import DinoSegmenter2
+import cv2
+from dinodescriptor import DinoDescriptor
+from dinomatcher import  DinoMatcher
+from dinosegmenter2 import DinoSegmenter2
+from ColorSegmenter import  ColorSegmenter
 import numpy as np
 import argparse
 import glob
 import csv
-import cv2
+
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-d", "--db", required = True, help = "path to the object information database csv file")

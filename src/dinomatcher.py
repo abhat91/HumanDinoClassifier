@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from dinoSegmenter2 import DinoSegmenter2
+from dinosegmenter2 import DinoSegmenter2
 
 class DinoMatcher:
     def __init__(self, descriptor, samplePaths, ratio = 0.7, minMatches = 30, useHamming = True):
