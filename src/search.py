@@ -1,6 +1,7 @@
 from __future__ import print_function
-from dinodescriptor import DinoDescriptor
-from dinomatcher import  DinoMatcher
+from dinoDescriptor import DinoDescriptor
+from dinoMatcher import  DinoMatcher
+from dinoSegmenter2 import DinoSegmenter2
 import argparse
 import glob
 import csv
@@ -28,21 +29,42 @@ minMatches = 15
 if useSIFT:
     minMatches = 50
 
+inputImage=cv2.imread(args["query"])
+
+# cv2.imshow('Raw', inputImage)
+# cv2.waitKey(0)
+
+
+
+segmenter = DinoSegmenter2()
+segImage = segmenter.segmentImage(inputImage)
+# cv2.imshow('Segmented', segImage)
+# cv2.waitKey(0)
 
 descriptor = DinoDescriptor(useSIFT = useSIFT)
 dinoMatcher = DinoMatcher(descriptor, glob.glob(args["samples"] + "/*.png"), ratio = ratio, minMatches = minMatches, useHamming = useHamming)
 
-queryImage = cv2.imread(args["query"])
-gray = cv2.cvtColor(queryImage, cv2.COLOR_BGR2GRAY)
-(queryKps, queryDescs) = descriptor.describe(gray)
+# queryImage = cv2.imread(args["query"])
+
+# capture from webcam
+# cap = cv2.VideoCapture(0)
+# while(True):
+#     ret, queryImage = cap.read()
+
+# gray = cv2.cvtColor(queryImage, cv2.COLOR_BGR2GRAY)
+(queryKps, queryDescs) = descriptor.describe(segImage)
+# To  show the key points
+KpImage = cv2.drawKeypoints(segImage, descriptor.kpsRaw, None)
+cv2.imshow("Query KP Image", KpImage)
+cv2.waitKey(0)
 
 results = dinoMatcher.search(queryKps, queryDescs)
 
-cv2.imshow("Query", queryImage)
+cv2.imshow("Query", inputImage)
 
 if len(results) == 0:
     print("no sample are matched to the query !")
-    cv2.waitKey(0)
+    cv2.waitKey(300)
 
 else:
     for(i, (score, samplePath)) in enumerate(results):
@@ -51,6 +73,12 @@ else:
 
         results = cv2.imread(samplePath)
         cv2.imshow("Matched Sample", results)
-        cv2.waitKey(0)
+
+cv2.waitKey(0)
+    # x = raw_input('press n to continue: ')
+    # if  x == 'n':
+    #     continue
+    # else:
+    #     break
 
 
