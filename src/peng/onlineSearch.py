@@ -49,7 +49,7 @@ while(True):
     segImage = segmenter.segmentImage(inputImage)
     (queryKps, queryDescs) = descriptor.describe(segImage)
     # To  show the key points
-    KpImage = cv2.drawKeypoints(segImage, descriptor.kpsRaw, None)
+    KpImage = cv2.drawKeypoints(inputImage, descriptor.kpsRaw, None)
     # cv2.waitKey(0)
     cv2.imshow("Input with Key Points", KpImage)
 
@@ -60,20 +60,20 @@ while(True):
     # else:
     #     break
 
-    results = dinoMatcher.search(queryKps, queryDescs)
-
-
-    if len(results) == 0:
-        print("no sample are matched to the query !")
-        cv2.waitKey(30)
-
-    else:
-        for(i, (score, samplePath)) in enumerate(results):
-            description = db[samplePath[samplePath.rfind("/") + 1:]]
-            print("{}.{:.2f}% : {}".format(i + 1, score * 100, description))
-
-            results = cv2.imread(samplePath) # only show the highest matching image
-            cv2.imshow("Right: Matched Sample", results)
+    # results = dinoMatcher.search(queryKps, queryDescs)
+    #
+    #
+    # if len(results) == 0:
+    #     print("no sample are matched to the query !")
+    #     cv2.waitKey(30)
+    #
+    # else:
+    #     for(i, (score, samplePath)) in enumerate(results):
+    #         description = db[samplePath[samplePath.rfind("/") + 1:]]
+    #         print("{}.{:.2f}% : {}".format(i + 1, score * 100, description))
+    #
+    #         results = cv2.imread(samplePath) # only show the highest matching image
+    #         cv2.imshow("Right: Matched Sample", results)
 
 
     # cv2.waitKey(0)

@@ -6,7 +6,7 @@ class DinoSegmenter2:
         #  red, blue, yellow, and gray colors range with upper and lower bound in the image.
         # color = [ B,G,R]
         self.boundaries = [
-            ([117,54,89], [247,152,235])]
+            ([125,80,80], [150,255,255])]
 
 
 
