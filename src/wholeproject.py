@@ -1,6 +1,7 @@
+
 import cv2
 import numpy as np
-
+import cv
 
 class BlobDetector:
     frame=0
@@ -59,7 +60,7 @@ def preprocessing(image):
 
 
 def removebackground(gray, background):
-    imgs=cv2.bitwise_xor(gray, background)
+    imgs=cv2.bitwise_not(cv2.bitwise_and(gray, background))
     blobdetecterhelper=BlobDetector()
     erode=blobdetecterhelper.erodeanddilate(imgs, 2,2)
     (thresh, im_bw) = cv2.threshold(erode, 25, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
@@ -69,6 +70,7 @@ def preprocessbackground(c, f, avg2):
     t=0
     while(t<100):
         _,f = c.read()
+        #Try median
         cv2.accumulateWeighted(f,avg2,0.01)
         res2 = cv2.convertScaleAbs(avg2)
         gray=cv2.cvtColor(res2, cv2.COLOR_BGR2GRAY)
@@ -80,8 +82,13 @@ def preprocessbackground(c, f, avg2):
         t+=1
         if k == 27:
             break
-
-
+def nothing(x):
+    pass
+################################################################################
+#Preprocessing stuff
+cv2.namedWindow('BackgroundRemoved')
+cv2.namedWindow('cannyOutput')
+################################################################################
 
 c = cv2.VideoCapture(0)
 _,f = c.read()
@@ -92,19 +99,20 @@ colorblobdetect=BlobDetector()
 _,f = c.read()
 gray=cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
 xsize, ysize= np.shape (gray)
+
 while True:
     _,f = c.read()
     gray=cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
-    
+
     image_nobackground=removebackground(gray, background)
 
 
     colorblobdetect.getBlob(f)
-    
-
-    op=cv2.addWeighted(image_nobackground, 0.3, colorblobdetect.imageBlob, 0.4, 0)
+    bg=0.4
+    blb=0.6
+    op=cv2.addWeighted(image_nobackground, bg, colorblobdetect.imageBlob, blb, 0)
     erodedImage=cv2.erode(op, None, iterations = 2)
-    
+
     (thresh, im_bw) = cv2.threshold(erodedImage, 10, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
     b,g,r = cv2.split(f)
     nb=np.minimum(im_bw, b)
@@ -113,31 +121,18 @@ while True:
     nr=np.minimum(im_bw, r)
     new=cv2.merge((nb, ng, nr))
 
-    cv2.imshow('avg2as',new)
+    objectdetection=cv2.cvtColor(new, cv2.COLOR_BGR2GRAY)
+    edged = cv2.Canny(objectdetection, 10, 250)
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
+    closed = cv2.morphologyEx(edged, cv2.MORPH_CLOSE, kernel)
+    (cnts, _) = cv2.findContours(closed.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    for csp in cnts:
+        print csp
+    cv2.imshow('cannyOutput',closed)
+    cv2.imshow('BackgroundRemoved',new)
     k = cv2.waitKey(20)
     if k == 27:
         break
 
 cv2.destroyAllWindows()
 c.release()
-
-
-gray_image = cv2.cvtColor(image, cv.CV_BGR2GRAY)
-b,g,r = cv2.split(image)
-preprocessed_image=preprocessing(image)
-cv2.merge((r-preprocessed_image,g-preprocessed_image,b-preprocessed_image))
-
-cv2.imshow('Detected image',)
-cv2.waitKey(0)
-
-
-
-
-
-
-
-
-
-
-
-
