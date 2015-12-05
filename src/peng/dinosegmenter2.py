@@ -7,6 +7,7 @@ class DinoSegmenter2:
         # color = [ B,G,R]
         self.boundaries = [
             ([125,80,80], [150,255,255])]
+            # ([130,80,150], [247,152,235])]
 
 
 
