@@ -63,8 +63,9 @@ while(True):
 
     results = dinoMatcher.search(queryKps, queryDescs)
 
-    dinoResultsHandler.showImages(queryImage, segImage, kpImage)
-    dinoResultsHandler.showTexts(results)
+    if len(results) > 0:
+        dinoResultsHandler.showImages(queryImage, segImage, kpImage)
+        dinoResultsHandler.showTexts(results)
 
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
