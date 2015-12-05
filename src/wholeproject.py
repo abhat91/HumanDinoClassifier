@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import cv
 from ColorSegmenter import ColorSegmenter
+from backgroundremoval import BackgroundRemoval
 
 class BlobDetector:
     frame=0
@@ -60,29 +61,6 @@ def preprocessing(image):
     return inverted_image
 
 
-def removebackground(gray, background):
-    imgs=cv2.bitwise_not(cv2.bitwise_and(gray, background))
-    blobdetecterhelper=BlobDetector()
-    erode=blobdetecterhelper.erodeanddilate(imgs, 2,2)
-    (thresh, im_bw) = cv2.threshold(erode, 25, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    return im_bw
-
-def preprocessbackground(c, f, avg2):
-    t=0
-    while(t<100):
-        _,f = c.read()
-        #Try median
-        cv2.accumulateWeighted(f,avg2,0.01)
-        res2 = cv2.convertScaleAbs(avg2)
-        gray=cv2.cvtColor(res2, cv2.COLOR_BGR2GRAY)
-        gray=cv2.medianBlur(gray,5)
-        global background
-        background=gray
-        cv2.imshow('avg2',gray)
-        k = cv2.waitKey(20)
-        t+=1
-        if k == 27:
-            break
 def nothing(x):
     pass
 ################################################################################
@@ -94,37 +72,23 @@ cv2.namedWindow('cannyOutput')
 c = cv2.VideoCapture(0)
 _,f = c.read()
 avg2 = np.float32(f)
-background=0
-gray=preprocessbackground(c, f, avg2)
+background=BackgroundRemoval.preprocessbackground(c, f, avg2)
 colorblobdetect=BlobDetector()
 _,f = c.read()
 gray=cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
-xsize, ysize= np.shape (gray)
 
 while True:
     _,f = c.read()
+    gray=cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
+    image_nobackground=BackgroundRemoval.removebackground(gray, background)
+    b,g,r = cv2.split(f)
+    nb=np.minimum(image_nobackground, b)
+    ng=np.minimum(image_nobackground, g)
+    nr=np.minimum(image_nobackground, r)
+    backgroundRemovedImage=cv2.merge((nb, ng, nr))
 
-
-    res = ColorSegmenter.getMagentaBlob(f)
-    # gray=cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
-
-    # image_nobackground=removebackground(gray, background)
-
-
-    # colorblobdetect.getBlob(f)
-    # bg=0.4
-    # blb=0.6
-    # op=cv2.addWeighted(image_nobackground, bg, colorblobdetect.imageBlob, blb, 0)
-    # erodedImage=cv2.erode(op, None, iterations = 2)
-
-    # (thresh, im_bw) = cv2.threshold(erodedImage, 10, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    # b,g,r = cv2.split(f)
-    # nb=np.minimum(im_bw, b)
-
-    # ng=np.minimum(im_bw, g)
-    # nr=np.minimum(im_bw, r)
-    #new=cv2.merge((nb, ng, nr))
-
+    res = ColorSegmenter.getMagentaBlob(backgroundRemovedImage)
+    cv2.imshow('RemovedBackground', backgroundRemovedImage)
     objectdetection=cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
     edged = cv2.Canny(objectdetection, 10, 250)
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
@@ -133,7 +97,6 @@ while True:
     for csp in cnts:
         print csp
     cv2.imshow('cannyOutput',closed)
-    #cv2.imshow('BackgroundRemoved',new)
     k = cv2.waitKey(20)
     if k == 27:
         break
