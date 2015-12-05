@@ -51,13 +51,17 @@ while(True):
     segImage = ColorSegmenter.getMagentaBlob(inputImage)
     gray = cv2.cvtColor(segImage, cv2.COLOR_BGR2GRAY)
     (queryKps, queryDescs) = descriptor.describe(gray)
-
+    # It is really important to handle the camera idling time.
+    if len(queryKps) == 0:
+        print("no key points detected in query!")
+        cv2.waitKey(500)
+        continue
     # To  show the key points
     KpImage = cv2.drawKeypoints(inputImage, descriptor.kpsRaw, None)
     # cv2.waitKey(0)
     cv2.imshow("Input with Key Points", KpImage)
 
-    # cv2.waitKey(0)
+    cv2.waitKey(100)
     # x = raw_input('press n to continue: ')
     # if  x == 'n':
     #     continue
@@ -80,11 +84,5 @@ while(True):
             cv2.imshow("Right: Matched Sample", results)
 
 
-    # cv2.waitKey(0)
-    # x = raw_input('press n to continue: ')
-    # if  x == 'n':
-    #     continue
-    # else:
-    #     break
 
 
