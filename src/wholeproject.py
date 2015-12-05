@@ -2,6 +2,7 @@
 import cv2
 import numpy as np
 import cv
+from ColorSegmenter import ColorSegmenter
 
 class BlobDetector:
     frame=0
@@ -104,22 +105,7 @@ while True:
     _,f = c.read()
 
 
-    hsvimg = cv2.cvtColor(f,cv2.COLOR_BGR2HSV)
-    blur = cv2.GaussianBlur(hsvimg,(7,7),0)
-     # define range of blue color in HSV
-    lower_magenta = np.array([125,80,80])
-    upper_magenta = np.array([150,255,255])
-
-
-
-    # Threshold the HSV image to get only blue colors
-    mask = cv2.inRange(blur, lower_magenta, upper_magenta)
-    mask = cv2.erode(mask,np.ones((2,2),np.uint8),iterations = 3)
-    # mask = cv2.dilate(mask,np.ones((3,3),np.uint8),iterations = 3)
-    mask = cv2.morphologyEx(mask,cv2.MORPH_OPEN,np.ones((7,7),np.uint8))
-    mask = cv2.morphologyEx(mask,cv2.MORPH_CLOSE,np.ones((5,5),np.uint8))
-    # Bitwise-AND mask and original image
-    res = cv2.bitwise_and(f,f, mask= mask)
+    res = ColorSegmenter.getMagentaBlob(f)
     # gray=cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
 
     # image_nobackground=removebackground(gray, background)
