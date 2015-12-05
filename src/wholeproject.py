@@ -102,26 +102,44 @@ xsize, ysize= np.shape (gray)
 
 while True:
     _,f = c.read()
-    gray=cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
-
-    image_nobackground=removebackground(gray, background)
 
 
-    colorblobdetect.getBlob(f)
-    bg=0.4
-    blb=0.6
-    op=cv2.addWeighted(image_nobackground, bg, colorblobdetect.imageBlob, blb, 0)
-    erodedImage=cv2.erode(op, None, iterations = 2)
+    hsvimg = cv2.cvtColor(f,cv2.COLOR_BGR2HSV)
+    blur = cv2.GaussianBlur(hsvimg,(7,7),0)
+     # define range of blue color in HSV
+    lower_magenta = np.array([125,80,80])
+    upper_magenta = np.array([150,255,255])
 
-    (thresh, im_bw) = cv2.threshold(erodedImage, 10, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    b,g,r = cv2.split(f)
-    nb=np.minimum(im_bw, b)
 
-    ng=np.minimum(im_bw, g)
-    nr=np.minimum(im_bw, r)
-    new=cv2.merge((nb, ng, nr))
 
-    objectdetection=cv2.cvtColor(new, cv2.COLOR_BGR2GRAY)
+    # Threshold the HSV image to get only blue colors
+    mask = cv2.inRange(blur, lower_magenta, upper_magenta)
+    mask = cv2.erode(mask,np.ones((2,2),np.uint8),iterations = 3)
+    # mask = cv2.dilate(mask,np.ones((3,3),np.uint8),iterations = 3)
+    mask = cv2.morphologyEx(mask,cv2.MORPH_OPEN,np.ones((7,7),np.uint8))
+    mask = cv2.morphologyEx(mask,cv2.MORPH_CLOSE,np.ones((5,5),np.uint8))
+    # Bitwise-AND mask and original image
+    res = cv2.bitwise_and(f,f, mask= mask)
+    # gray=cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
+
+    # image_nobackground=removebackground(gray, background)
+
+
+    # colorblobdetect.getBlob(f)
+    # bg=0.4
+    # blb=0.6
+    # op=cv2.addWeighted(image_nobackground, bg, colorblobdetect.imageBlob, blb, 0)
+    # erodedImage=cv2.erode(op, None, iterations = 2)
+
+    # (thresh, im_bw) = cv2.threshold(erodedImage, 10, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    # b,g,r = cv2.split(f)
+    # nb=np.minimum(im_bw, b)
+
+    # ng=np.minimum(im_bw, g)
+    # nr=np.minimum(im_bw, r)
+    #new=cv2.merge((nb, ng, nr))
+
+    objectdetection=cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
     edged = cv2.Canny(objectdetection, 10, 250)
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
     closed = cv2.morphologyEx(edged, cv2.MORPH_CLOSE, kernel)
@@ -129,7 +147,7 @@ while True:
     for csp in cnts:
         print csp
     cv2.imshow('cannyOutput',closed)
-    cv2.imshow('BackgroundRemoved',new)
+    #cv2.imshow('BackgroundRemoved',new)
     k = cv2.waitKey(20)
     if k == 27:
         break
