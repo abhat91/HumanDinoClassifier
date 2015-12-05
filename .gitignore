@@ -9,3 +9,4 @@ src/peng/matcher.pyc
 dinodescriptor.pyc
 dinomatcher.pyc
 dinosegmenter2.pyc
+ColorSegmenter.pyc

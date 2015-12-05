@@ -35,7 +35,7 @@ if useSIFT:
 inputImage=cv2.imread(args["query"])
 
 
-segmenter = DinoSegmenter2()
+# segmenter = DinoSegmenter2()
 # cv2.imshow('Segmented', segImage)
 # cv2.waitKey(0)
 
@@ -48,8 +48,10 @@ dinoMatcher = DinoMatcher(descriptor, glob.glob(args["samples"] + "/*.png"), rat
 cap = cv2.VideoCapture(0)
 while(True):
     ret, inputImage = cap.read()
-    segImage = segmenter.segmentImage(inputImage)
-    (queryKps, queryDescs) = descriptor.describe(segImage)
+    segImage = ColorSegmenter.getMagentaBlob(inputImage)
+    gray = cv2.cvtColor(segImage, cv2.COLOR_BGR2GRAY)
+    (queryKps, queryDescs) = descriptor.describe(gray)
+
     # To  show the key points
     KpImage = cv2.drawKeypoints(inputImage, descriptor.kpsRaw, None)
     # cv2.waitKey(0)
