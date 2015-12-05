@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+from dinoSegmenter2 import DinoSegmenter2
 
 class DinoMatcher:
     def __init__(self, descriptor, samplePaths, ratio = 0.7, minMatches = 30, useHamming = True):
@@ -18,8 +19,12 @@ class DinoMatcher:
 
         for samplePath in self.samplePaths:
             obj = cv2.imread(samplePath)
-            gray = cv2.cvtColor(obj, cv2.COLOR_BGR2GRAY)
-            (kps, descs) = self.descriptor.describe(gray)
+
+            segmenter = DinoSegmenter2()
+            segImage = segmenter.segmentImage(obj)
+
+            # gray = cv2.cvtColor(obj, cv2.COLOR_BGR2GRAY)
+            (kps, descs) = self.descriptor.describe(segImage)
 
             score = self.match(queryKps, queryDescs, kps, descs)
             results[samplePath] = score
