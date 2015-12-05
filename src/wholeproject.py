@@ -9,13 +9,10 @@ class BlobDetector:
     imageBlob=0
 
     #Adjust these for the right values (adjust these again for realtime data)
-    boundaries = [([50,50,50], [255,255,255]), ([100,100,100], [120,255,255])]
+    boundaries = [[124,10,10], [185,255,255]]
 
-    lowthresh_lower = np.array(boundaries[0][0], dtype = "uint8")
-    lowthresh_upper = np.array(boundaries[0][1], dtype = "uint8")
-
-    highthresh_lower = np.array(boundaries[1][0], dtype = "uint8")
-    highthresh_upper = np.array(boundaries[1][1], dtype = "uint8")
+    thresh_lower = np.array(boundaries[0][0], dtype = "uint8")
+    thresh_upper = np.array(boundaries[1][0], dtype = "uint8")
 
 
     def erodeanddilate(self, image, erosionCount, dilationCount):
@@ -29,7 +26,7 @@ class BlobDetector:
 
     def thresholderodeanddilate(self):
         #Do this again to get the upper threshold (Double threshold is the norm)
-        self.lower_pink_hue_range=cv2.inRange(self.frame, self.lowthresh_lower, self.lowthresh_upper)
+        self.lower_pink_hue_range=cv2.inRange(self.frame, self.thresh_lower, self.thresh_upper)
         self.tempimage=self.erodeanddilate(self.lower_pink_hue_range, 2, 10)
 
 
@@ -99,8 +96,6 @@ while True:
     _,f = c.read()
     gray=cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
     
-
-
     image_nobackground=removebackground(gray, background)
 
 
@@ -117,6 +112,7 @@ while True:
     ng=np.minimum(im_bw, g)
     nr=np.minimum(im_bw, r)
     new=cv2.merge((nb, ng, nr))
+
     cv2.imshow('avg2as',new)
     k = cv2.waitKey(20)
     if k == 27:
