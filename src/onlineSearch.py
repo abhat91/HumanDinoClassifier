@@ -1,9 +1,9 @@
 from __future__ import print_function
 import cv2
-from dinodescriptor import DinoDescriptor
-from dinomatcher import  DinoMatcher
-from dinosegmenter2 import DinoSegmenter2
+from dinoDescriptor import DinoDescriptor
+from dinoMatcher import  DinoMatcher
 from ColorSegmenter import  ColorSegmenter
+from dinoResultsHandler import DinoResultsHandler
 import numpy as np
 import argparse
 import glob
@@ -41,14 +41,15 @@ inputImage=cv2.imread(args["query"])
 
 descriptor = DinoDescriptor(useSIFT = useSIFT)
 dinoMatcher = DinoMatcher(descriptor, glob.glob(args["samples"] + "/*.png"), ratio = ratio, minMatches = minMatches, useHamming = useHamming)
+dinoResultsHandler = DinoResultsHandler(db)
 
 # queryImage = cv2.imread(args["query"])
 
 # capture from webcam
 cap = cv2.VideoCapture(0)
 while(True):
-    ret, inputImage = cap.read()
-    segImage = ColorSegmenter.getMagentaBlob(inputImage)
+    ret, queryImage = cap.read()
+    segImage = ColorSegmenter.getMagentaBlob(queryImage)
     gray = cv2.cvtColor(segImage, cv2.COLOR_BGR2GRAY)
     (queryKps, queryDescs) = descriptor.describe(gray)
     # It is really important to handle the camera idling time.
@@ -57,31 +58,22 @@ while(True):
         cv2.waitKey(500)
         continue
     # To  show the key points
-    KpImage = cv2.drawKeypoints(inputImage, descriptor.kpsRaw, None)
+    kpImage = cv2.drawKeypoints(inputImage, descriptor.kpsRaw, None)
     # cv2.waitKey(0)
-    cv2.imshow("Input with Key Points", KpImage)
-
-    cv2.waitKey(100)
-    # x = raw_input('press n to continue: ')
-    # if  x == 'n':
-    #     continue
-    # else:
-    #     break
 
     results = dinoMatcher.search(queryKps, queryDescs)
 
+    dinoResultsHandler.showImages(queryImage, segImage, kpImage)
+    dinoResultsHandler.showTexts(results)
 
-    if len(results) == 0:
-        print("no sample are matched to the query !")
-        cv2.waitKey(30)
+    if cv2.waitKey(1) & 0xFF == ord("q"):
+        break
 
-    else:
-        for(i, (score, samplePath)) in enumerate(results):
-            description = db[samplePath[samplePath.rfind("/") + 1:]]
-            print("{}.{:.2f}% : {}".format(i + 1, score * 100, description))
+cap.release()
+cv2.destroyAllWindows()
 
-            results = cv2.imread(samplePath) # only show the highest matching image
-            cv2.imshow("Right: Matched Sample", results)
+
+
 
 
 
