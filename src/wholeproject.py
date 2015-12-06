@@ -67,7 +67,6 @@ def nothing(x):
 #Preprocessing stuff
 cv2.namedWindow('BackgroundRemoved')
 cv2.namedWindow('cannyOutput')
-cv2.namedWindow('SampleOutput')
 ################################################################################
 
 c = cv2.VideoCapture(0)
@@ -82,8 +81,7 @@ sampleimageedges = cv2.Canny(sampleImage, 10, 250)
 sampleImageT=cv2.imread('/home/adi/Desktop/HumanDinoClassifier/testimages/dino3.png',0)
 sampleimageedgesT = cv2.Canny(sampleImage, 10, 250)
 (cnts, _) = cv2.findContours(sampleimageedgesT.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-for csp in cnts:
-    print cv2.convexHull(csp,returnPoints = False)
+
 while True:
     _,f = c.read()
     gray=cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
@@ -100,7 +98,22 @@ while True:
     edged = cv2.Canny(objectdetection, 100, 250)
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
     closed = cv2.morphologyEx(edged, cv2.MORPH_CLOSE, kernel)
-    cv2.imshow('cannyOutput',closed)
+
+    contours,hierarchy = cv2.findContours(closed,2,1)
+    for cnt in contours:
+        hull = cv2.convexHull(cnt,returnPoints = False)
+        if(len(hull)>3 and len(cnt)>3):
+            defects = cv2.convexityDefects(cnt,hull)
+            if defects!=None:
+                for i in range(defects.shape[0]):
+                    s,e,f,d = defects[i,0]
+                    start = tuple(cnt[s][0])
+                    end = tuple(cnt[e][0])
+                    far = tuple(cnt[f][0])
+                    cv2.line(res,start,end,[0,255,0],2)
+                    cv2.circle(closed,far,5,[0,0,255],-1)
+
+    cv2.imshow('cannyOutput',res)
     k = cv2.waitKey(20)
     if k == 27:
         break
