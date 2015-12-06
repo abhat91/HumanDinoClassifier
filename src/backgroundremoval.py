@@ -7,7 +7,7 @@ class BackgroundRemoval:
     def preprocessbackground(c, f, avg2):
         t=0
         gray=0
-        while(t<100):
+        while(t<50):
             _,f = c.read()
             #Try median
             cv2.accumulateWeighted(f,avg2,0.01)

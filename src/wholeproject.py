@@ -108,14 +108,15 @@ while True:
             defects = cv2.convexityDefects(cnt,hull)
             if defects!=None:
                 areaContours=areaContours+[(area, len(defects))]
-                for i in range(defects.shape[0]):
-                    s,e,f,d = defects[i,0]
-                    start = tuple(cnt[s][0])
-                    end = tuple(cnt[e][0])
-                    far = tuple(cnt[f][0])
-                    convexpoly.append(start)
-                    convexpoly.append(end)
-                    cv2.line(res,start,end,[0,255,0],2)
+                if area>1000:
+                    for i in range(defects.shape[0]):
+                        s,e,f,d = defects[i,0]
+                        start = tuple(cnt[s][0])
+                        end = tuple(cnt[e][0])
+                        far = tuple(cnt[f][0])
+                        convexpoly.append(start)
+                        convexpoly.append(end)
+                        cv2.line(res,start,end,[0,255,0],2)
                     #cv2.fillConvexPoly(res, np.array([convexpoly]), (255, 255, 255))
     forareaofhull=cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
     contoursforhull,hierarchy = cv2.findContours(forareaofhull,2,1)
@@ -125,18 +126,18 @@ while True:
         area = cv2.contourArea(cntforhull)
         areaWithHull=areaWithHull+[area]
     if len(areaContours)>0:
-        if max(areaWithHull)>500:
+        if max(areaWithHull)>1000:
             ratioOfAreas=max(areaContours,key=itemgetter(1))[0]/float(max(areaWithHull))
             cv2.putText(res,"{:0.2f}".format(ratioOfAreas), (0, res.shape[0]-80), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
 
             if ratioOfAreas>0.5 and ratioOfAreas<0.65:
-                cv2.putText(res,'It is a T-Rex', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
+                cv2.putText(res,'T-Rex', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
             elif ratioOfAreas>0.70 and ratioOfAreas<0.77:
-                cv2.putText(res, 'Its a Stegosaurus', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
+                cv2.putText(res, 'Stegosaurus', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
             elif ratioOfAreas>0.78 and ratioOfAreas<0.84:
-                cv2.putText(res, 'Its a Triceratops', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
+                cv2.putText(res, 'Triceratops', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
             elif ratioOfAreas>0.86:
-                cv2.putText(res, 'It was a volcano', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
+                cv2.putText(res, 'Volcano', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
     ret, __thresh = cv2.threshold(res, 127, 255,0)
     cv2.imshow('Output',res)
     k = cv2.waitKey(20)
