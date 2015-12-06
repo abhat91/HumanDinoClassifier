@@ -4,10 +4,12 @@ from dinoDescriptor import DinoDescriptor
 from dinoMatcher import  DinoMatcher
 from ColorSegmenter import  ColorSegmenter
 from dinoResultsHandler import DinoResultsHandler
+import utils2
 import numpy as np
 import argparse
 import glob
 import csv
+import time
 
 
 ap = argparse.ArgumentParser()
@@ -18,7 +20,6 @@ ap.add_argument("-f", "--sift", type = int, default = 0, help = "use SIFT = 1, n
 
 args = vars(ap.parse_args())
 
-
 db = {}
 
 for line in csv.reader(open(args["db"])):
@@ -26,56 +27,50 @@ for line in csv.reader(open(args["db"])):
 
 useSIFT = args["sift"] > 0
 useHamming = args["sift"] == 0
-ratio = 0.6
+ratio = 0.7
 minMatches = 15
 
 if useSIFT:
     minMatches = 50
 
-inputImage=cv2.imread(args["query"])
-
-
-# segmenter = DinoSegmenter2()
-# cv2.imshow('Segmented', segImage)
-# cv2.waitKey(0)
-
 descriptor = DinoDescriptor(useSIFT = useSIFT)
 dinoMatcher = DinoMatcher(descriptor, glob.glob(args["samples"] + "/*.png"), ratio = ratio, minMatches = minMatches, useHamming = useHamming)
 dinoResultsHandler = DinoResultsHandler(db)
 
-# queryImage = cv2.imread(args["query"])
-
-# capture from webcam
+# capture from web cam
 cap = cv2.VideoCapture(0)
-while(True):
+while True:
     ret, queryImage = cap.read()
-    segImage = ColorSegmenter.getMagentaBlob(queryImage)
-    gray = cv2.cvtColor(segImage, cv2.COLOR_BGR2GRAY)
-    (queryKps, queryDescs) = descriptor.describe(gray)
-    # It is really important to handle the camera idling time.
-    if len(queryKps) == 0:
-        print("no key points detected in query!")
-        cv2.waitKey(500)
-        continue
-    # To  show the key points
-    kpImage = cv2.drawKeypoints(inputImage, descriptor.kpsRaw, None)
-    # cv2.waitKey(0)
+    if ret == True:
+        queryImage = utils2.resize(queryImage, width = 1000)
+        # Segment the pink area out
+        segImage = ColorSegmenter.getMagentaBlob(queryImage)
+        # Describe the query image
+        (queryKps, queryDescs, queryKpdRaw) = descriptor.describeQuery(segImage)
+        # It is really important to handle the camera idling time.
+        if len(queryKps) == 0:
+            print("Place The Object In The Camera!")
+            cv2.imshow("Query", queryImage)
+        # else let's start matching our samples to the query
+        else:
+            # To show the key points on query image
+            kpImage = cv2.drawKeypoints(queryImage, queryKpdRaw, None)
+            # let's also add the cool green box
+            greenBoxImg = dinoResultsHandler.drawGreenBox(queryImage, segImage, kpImage)
+            # showing the box must have a timer sleep, otherwise it will be flushed
+            cv2.imshow("Query", greenBoxImg)
+            time.sleep(0.025)
+            # Matching, the key step
+            results = dinoMatcher.search(queryKps, queryDescs)
+            # print out our matching rates
+            dinoResultsHandler.showTexts(results)
 
-    results = dinoMatcher.search(queryKps, queryDescs)
-
-    if len(results) > 0:
-        dinoResultsHandler.showImages(queryImage, segImage, kpImage)
-        dinoResultsHandler.showTexts(results)
-
-    if cv2.waitKey(1) & 0xFF == ord("q"):
+        # Nicer function, press 'q' to quite the program
+        if cv2.waitKey(20) & 0xFF == ord("q"):
+            break
+    # break when camera is wrong.
+    else:
         break
-
+# Release the camera and close all opened windows
 cap.release()
 cv2.destroyAllWindows()
-
-
-
-
-
-
-

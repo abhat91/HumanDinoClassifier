@@ -1,6 +1,5 @@
 import numpy as np
 import cv2
-from dinosegmenter2 import DinoSegmenter2
 from ColorSegmenter import ColorSegmenter
 
 class DinoMatcher:
@@ -16,9 +15,6 @@ class DinoMatcher:
 
     # now search the thing
     def search(self, queryKps, queryDescs):
-
-
-
         results = {}
 
         for samplePath in self.samplePaths:
@@ -27,8 +23,8 @@ class DinoMatcher:
             # segmenter = DinoSegmenter2()
             segImage = ColorSegmenter.getMagentaBlob(obj)
 
-            gray = cv2.cvtColor(segImage, cv2.COLOR_BGR2GRAY)
-            (kps, descs) = self.descriptor.describe(gray)
+            # gray = cv2.cvtColor(segImage, cv2.COLOR_BGR2GRAY)
+            (kps, descs) = self.descriptor.describe(segImage)
 
             score = self.match(queryKps, queryDescs, kps, descs)
             results[samplePath] = score
@@ -48,6 +44,9 @@ class DinoMatcher:
         for m in rawMatches:
             if len(m) == 2 and m[0].distance < m[1].distance * self.ratio:
                 matches.append((m[0].trainIdx, m[0].queryIdx)) #be careful with the train/query orders, I'm not sure
+
+        # Test  Info
+        print("{}: {}".format("Current matches: ", len(matches)))
 
         if len(matches) > self.minMatches:
             ptsA = np.float32([kpsA[i] for (i, _) in matches])

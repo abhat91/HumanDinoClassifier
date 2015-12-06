@@ -9,3 +9,4 @@ class Util:
         """Get the path to the current folder"""
         folderPath=os.getcwd()
         return folderPath
+

@@ -10,3 +10,6 @@ dinodescriptor.pyc
 dinomatcher.pyc
 dinosegmenter2.pyc
 ColorSegmenter.pyc
+dinoResultsHandler.pyc
+utils.pyc
+utils2.pyc
