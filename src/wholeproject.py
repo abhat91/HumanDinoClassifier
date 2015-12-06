@@ -4,7 +4,7 @@ import numpy as np
 import cv
 from ColorSegmenter import ColorSegmenter
 from backgroundremoval import BackgroundRemoval
-
+from operator import itemgetter
 class BlobDetector:
     frame=0
     lower_pink_hue_range=0
@@ -72,13 +72,8 @@ c = cv2.VideoCapture(0)
 _,f = c.read()
 avg2 = np.float32(f)
 background=BackgroundRemoval.preprocessbackground(c, f, avg2)
-colorblobdetect=BlobDetector()
 _,f = c.read()
 gray=cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
-sampleImage=cv2.imread('/home/adi/Desktop/HumanDinoClassifier/testimages/dino2.png',0)
-(thresh, im_bwsample) = cv2.threshold(sampleImage, 25, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-sampleimageedges = cv2.Canny(im_bwsample, 10, 250)
-sampleContour,whogivesashit = cv2.findContours(sampleimageedges,2,1)
 while True:
     _,f = c.read()
     gray=cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
@@ -96,23 +91,47 @@ while True:
     closed = cv2.morphologyEx(edged, cv2.MORPH_CLOSE, kernel)
 
     contours,hierarchy = cv2.findContours(closed,2,1)
+    convexpoly=[]
+    areaContours=[]
     for cnt in contours:
+        #Only if there are 2 contours or something
+        area = cv2.contourArea(cnt)
         hull = cv2.convexHull(cnt,returnPoints = False)
         if(len(hull)>3 and len(cnt)>3):
             defects = cv2.convexityDefects(cnt,hull)
             if defects!=None:
+                areaContours=areaContours+[(area, len(defects))]
                 for i in range(defects.shape[0]):
                     s,e,f,d = defects[i,0]
                     start = tuple(cnt[s][0])
                     end = tuple(cnt[e][0])
                     far = tuple(cnt[f][0])
+                    convexpoly.append(start)
+                    convexpoly.append(end)
                     cv2.line(res,start,end,[0,255,0],2)
-                    cv2.circle(closed,far,5,[0,0,255],-1)
-
-    cv2.imshow('cannyOutput',res)
+                    #cv2.fillConvexPoly(res, np.array([convexpoly]), (255, 255, 255))
+    forareaofhull=cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
+    contoursforhull,hierarchy = cv2.findContours(forareaofhull,2,1)
+    areaWithHull=[]
+    for cntforhull in contoursforhull:
+        #Only if there are 2 contours or something
+        area = cv2.contourArea(cntforhull)
+        areaWithHull=areaWithHull+[area]
+        if len(areaContours)>0:
+            if max(areaWithHull)>500:
+                ratioOfAreas=max(areaContours,key=itemgetter(1))[0]/float(max(areaWithHull))
+                if ratioOfAreas>0.5 and ratioOfAreas<0.65:
+                    cv2.putText(res, 'It is a T-Rex', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255))
+                elif ratioOfAreas>0.70 and ratioOfAreas<0.75:
+                    cv2.putText(res, 'Its a Stegosaurus', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255))
+                elif ratioOfAreas>0.75 and ratioOfAreas<0.84:
+                    cv2.putText(res, 'Its a Triceratops', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255))
+                elif ratioOfAreas>0.86:
+                    cv2.putText(res, 'It was a volcano', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255))
+    ret, __thresh = cv2.threshold(res, 127, 255,0)
+    cv2.imshow('Output',res)
     k = cv2.waitKey(20)
     if k == 27:
         break
-
 cv2.destroyAllWindows()
 c.release()

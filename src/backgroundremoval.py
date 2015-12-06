@@ -19,6 +19,7 @@ class BackgroundRemoval:
             t+=1
             if k == 27:
                 break
+        cv2.destroyWindow('avg2')
         return gray
 
     @staticmethod
