@@ -65,7 +65,6 @@ def nothing(x):
     pass
 ################################################################################
 #Preprocessing stuff
-cv2.namedWindow('BackgroundRemoved')
 cv2.namedWindow('cannyOutput')
 ################################################################################
 
@@ -77,11 +76,9 @@ colorblobdetect=BlobDetector()
 _,f = c.read()
 gray=cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
 sampleImage=cv2.imread('/home/adi/Desktop/HumanDinoClassifier/testimages/dino2.png',0)
-sampleimageedges = cv2.Canny(sampleImage, 10, 250)
-sampleImageT=cv2.imread('/home/adi/Desktop/HumanDinoClassifier/testimages/dino3.png',0)
-sampleimageedgesT = cv2.Canny(sampleImage, 10, 250)
-(cnts, _) = cv2.findContours(sampleimageedgesT.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
+(thresh, im_bwsample) = cv2.threshold(sampleImage, 25, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+sampleimageedges = cv2.Canny(im_bwsample, 10, 250)
+sampleContour,whogivesashit = cv2.findContours(sampleimageedges,2,1)
 while True:
     _,f = c.read()
     gray=cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
@@ -93,7 +90,6 @@ while True:
     backgroundRemovedImage=cv2.merge((nb, ng, nr))
 
     res = ColorSegmenter.getMagentaBlob(backgroundRemovedImage)
-    cv2.imshow('RemovedBackground', res)
     objectdetection=cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
     edged = cv2.Canny(objectdetection, 100, 250)
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
