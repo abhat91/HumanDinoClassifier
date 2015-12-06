@@ -5,6 +5,8 @@ import cv
 from ColorSegmenter import ColorSegmenter
 from backgroundremoval import BackgroundRemoval
 from operator import itemgetter
+import copy
+
 class BlobDetector:
     frame=0
     lower_pink_hue_range=0
@@ -98,8 +100,8 @@ while True:
     closed = cv2.morphologyEx(edged, cv2.MORPH_CLOSE, kernel)
 
     contours,hierarchy = cv2.findContours(closed,2,1)
-    convexpoly=[]
     areaContours=[]
+    res2 = copy.deepcopy(res)
     for cnt in contours:
         #Only if there are 2 contours or something
         area = cv2.contourArea(cnt)
@@ -107,18 +109,15 @@ while True:
         if(len(hull)>3 and len(cnt)>3):
             defects = cv2.convexityDefects(cnt,hull)
             if defects!=None:
-                areaContours=areaContours+[(area, len(defects))]
+                areaContours=areaContours+[(area, len(defects),defects,cnt)]
                 if area>1000:
                     for i in range(defects.shape[0]):
                         s,e,f,d = defects[i,0]
                         start = tuple(cnt[s][0])
                         end = tuple(cnt[e][0])
-                        far = tuple(cnt[f][0])
-                        convexpoly.append(start)
-                        convexpoly.append(end)
-                        cv2.line(res,start,end,[0,255,0],2)
-                    #cv2.fillConvexPoly(res, np.array([convexpoly]), (255, 255, 255))
-    forareaofhull=cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
+                        cv2.line(res2,start,end,[0,255,0],2)
+                    # cv2.fillConvexPoly(res2, np.array([convexpoly]), (255, 255, 255))
+    forareaofhull=cv2.cvtColor(res2, cv2.COLOR_BGR2GRAY)
     contoursforhull,hierarchy = cv2.findContours(forareaofhull,2,1)
     areaWithHull=[]
     for cntforhull in contoursforhull:
@@ -127,6 +126,12 @@ while True:
         areaWithHull=areaWithHull+[area]
     if len(areaContours)>0:
         if max(areaWithHull)>1000:
+            defects = max(areaContours,key=itemgetter(1))
+            for i in range(defects[2].shape[0]):
+                s,e,f,d = defects[2][i,0]
+                start = tuple(defects[3][s][0])
+                end = tuple(defects[3][e][0])
+                cv2.line(res,start,end,[0,255,0],2)
             ratioOfAreas=max(areaContours,key=itemgetter(1))[0]/float(max(areaWithHull))
             cv2.putText(res,"{:0.2f}".format(ratioOfAreas), (0, res.shape[0]-80), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
 
