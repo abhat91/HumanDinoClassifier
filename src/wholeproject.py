@@ -65,7 +65,6 @@ def nothing(x):
     pass
 ################################################################################
 #Preprocessing stuff
-cv2.namedWindow('BackgroundRemoved')
 cv2.namedWindow('cannyOutput')
 ################################################################################
 
@@ -76,7 +75,10 @@ background=BackgroundRemoval.preprocessbackground(c, f, avg2)
 colorblobdetect=BlobDetector()
 _,f = c.read()
 gray=cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
-
+sampleImage=cv2.imread('/home/adi/Desktop/HumanDinoClassifier/testimages/dino2.png',0)
+(thresh, im_bwsample) = cv2.threshold(sampleImage, 25, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+sampleimageedges = cv2.Canny(im_bwsample, 10, 250)
+sampleContour,whogivesashit = cv2.findContours(sampleimageedges,2,1)
 while True:
     _,f = c.read()
     gray=cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
@@ -88,15 +90,26 @@ while True:
     backgroundRemovedImage=cv2.merge((nb, ng, nr))
 
     res = ColorSegmenter.getMagentaBlob(backgroundRemovedImage)
-    cv2.imshow('RemovedBackground', backgroundRemovedImage)
     objectdetection=cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
-    edged = cv2.Canny(objectdetection, 10, 250)
+    edged = cv2.Canny(objectdetection, 100, 250)
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
     closed = cv2.morphologyEx(edged, cv2.MORPH_CLOSE, kernel)
-    (cnts, _) = cv2.findContours(closed.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    for csp in cnts:
-        print csp
-    cv2.imshow('cannyOutput',closed)
+
+    contours,hierarchy = cv2.findContours(closed,2,1)
+    for cnt in contours:
+        hull = cv2.convexHull(cnt,returnPoints = False)
+        if(len(hull)>3 and len(cnt)>3):
+            defects = cv2.convexityDefects(cnt,hull)
+            if defects!=None:
+                for i in range(defects.shape[0]):
+                    s,e,f,d = defects[i,0]
+                    start = tuple(cnt[s][0])
+                    end = tuple(cnt[e][0])
+                    far = tuple(cnt[f][0])
+                    cv2.line(res,start,end,[0,255,0],2)
+                    cv2.circle(closed,far,5,[0,0,255],-1)
+
+    cv2.imshow('cannyOutput',res)
     k = cv2.waitKey(20)
     if k == 27:
         break
