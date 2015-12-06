@@ -1,5 +1,4 @@
 import numpy as np
-import time
 import cv2
 
 class DinoResultsHandler:
@@ -26,7 +25,7 @@ class DinoResultsHandler:
     def showTexts(self, matchedResults):
 
         if len(matchedResults) == 0:
-            print("no sample are matched to the query !")
+            print("No samples are matched to the query !")
 
 
         else:

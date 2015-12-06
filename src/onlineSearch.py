@@ -40,33 +40,33 @@ dinoResultsHandler = DinoResultsHandler(db)
 # capture from web cam
 cap = cv2.VideoCapture(0)
 while True:
-    ret, frame = cap.read()
+    ret, queryImage = cap.read()
     if ret == True:
-        queryImage = utils2.resize(frame, width = 1000)
+        queryImage = utils2.resize(queryImage, width = 1000)
         # Segment the pink area out
         segImage = ColorSegmenter.getMagentaBlob(queryImage)
         # Describe the query image
-        (queryKps, queryDescs) = descriptor.describe(segImage)
+        (queryKps, queryDescs, queryKpdRaw) = descriptor.describeQuery(segImage)
         # It is really important to handle the camera idling time.
-        if len(queryKps) <= 0:
-            print("Please Place The Object In The Camera!")
+        if len(queryKps) == 0:
+            print("Place The Object In The Camera!")
             cv2.imshow("Query", queryImage)
         # else let's start matching our samples to the query
         else:
-            # Matching, the key step
-            results = dinoMatcher.search(queryKps, queryDescs)
             # To show the key points on query image
-            kpImage = cv2.drawKeypoints(queryImage, descriptor.kpsRaw, None)
+            kpImage = cv2.drawKeypoints(queryImage, queryKpdRaw, None)
             # let's also add the cool green box
             greenBoxImg = dinoResultsHandler.drawGreenBox(queryImage, segImage, kpImage)
             # showing the box must have a timer sleep, otherwise it will be flushed
-            cv2.imshow("Green Box", greenBoxImg)
+            cv2.imshow("Query", greenBoxImg)
             time.sleep(0.025)
+            # Matching, the key step
+            results = dinoMatcher.search(queryKps, queryDescs)
             # print out our matching rates
             dinoResultsHandler.showTexts(results)
 
         # Nicer function, press 'q' to quite the program
-        if cv2.waitKey(50) & 0xFF == ord("q"):
+        if cv2.waitKey(20) & 0xFF == ord("q"):
             break
     # break when camera is wrong.
     else:

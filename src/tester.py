@@ -33,7 +33,7 @@ minMatches = 15
 if useSIFT:
     minMatches = 50
 
-inputImage=cv2.imread(args["query"])
+# inputImage=cv2.imread(args["query"])
 
 
 # segmenter = DinoSegmenter2()

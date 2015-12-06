@@ -1,6 +1,5 @@
 import numpy as np
 import cv2
-from dinosegmenter2 import DinoSegmenter2
 from ColorSegmenter import ColorSegmenter
 
 class DinoMatcher:
