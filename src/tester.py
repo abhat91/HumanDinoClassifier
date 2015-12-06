@@ -1,26 +1,30 @@
 import cv2
-from ColorSegmenter import ColorSegmenter
-from dinodescriptor import DinoDescriptor
+import csv
+from dinoDescriptor import DinoDescriptor
+from dinoMatcher import  DinoMatcher
+from ColorSegmenter import  ColorSegmenter
+from dinoResultsHandler import DinoResultsHandler
 
-# image = cv2.imread("./queries/query12_Rot_nomark.png")
-cap = cv2.VideoCapture(0)
-while(True):
-    ret, image = cap.read()
+queryImage = cv2.imread("./queries/query12_Rot_nomark.png")
 
-    segImage = ColorSegmenter.getMagentaBlob(image)
-    cv2.imshow("seg", segImage)
-    gray = cv2.cvtColor(segImage, cv2.COLOR_BGR2GRAY)
-    cv2.imshow("gray", gray)
+db = {}
 
-    descriptor = DinoDescriptor()
-    (queryKps, queryDescs) = descriptor.describe(gray)
-    KpImage = cv2.drawKeypoints(gray, descriptor.kpsRaw, None)
-    cv2.imshow("Input with Key Points", KpImage)
+for line in csv.reader(open("./dinoDB.csv")):
+    db[line[0]] = line[1:]
 
-    # cv2.waitKey(100)
+descriptor = DinoDescriptor()
+dinoResultsHandler = DinoResultsHandler(db)
 
-# cap = cv2.VideoCapture(0)
-# while(True):
-#     ret, inputImage = cap.read()
-#     segImage = ColorSegmenter.getMagentaBlob(inputImage)
-#     gray = cv2.cvtColor(segImage, cv2.COLOR_BGR2GRAY)
+
+segImage = ColorSegmenter.getMagentaBlob(queryImage)
+# gray = cv2.cvtColor(segImage, cv2.COLOR_BGR2GRAY)
+(queryKps, queryDescs) = descriptor.describe(segImage)
+
+kpImage = cv2.drawKeypoints(queryImage.copy(), descriptor.kpsRaw, None)
+
+
+dinoResultsHandler.showImages(queryImage, segImage, kpImage)
+
+cv2.waitKey(0)
+
+

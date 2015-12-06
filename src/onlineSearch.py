@@ -47,25 +47,34 @@ dinoResultsHandler = DinoResultsHandler(db)
 
 # capture from webcam
 cap = cv2.VideoCapture(0)
-while(True):
+while True:
     ret, queryImage = cap.read()
+    # return when camera wrong
+    if not ret:
+        break
+    # Segment the pink area out
     segImage = ColorSegmenter.getMagentaBlob(queryImage)
-    gray = cv2.cvtColor(segImage, cv2.COLOR_BGR2GRAY)
-    (queryKps, queryDescs) = descriptor.describe(gray)
+
+    (queryKps, queryDescs) = descriptor.describe(segImage)
     # It is really important to handle the camera idling time.
     if len(queryKps) == 0:
         print("no key points detected in query!")
         cv2.waitKey(500)
         continue
     # To  show the key points
-    kpImage = cv2.drawKeypoints(inputImage, descriptor.kpsRaw, None)
+    kpImage = cv2.drawKeypoints(queryImage, descriptor.kpsRaw, None)
     # cv2.waitKey(0)
 
     results = dinoMatcher.search(queryKps, queryDescs)
 
-    if len(results) > 0:
-        dinoResultsHandler.showImages(queryImage, segImage, kpImage)
-        dinoResultsHandler.showTexts(results)
+    dinoResultsHandler.showImages(queryImage, segImage, kpImage)
+    dinoResultsHandler.showTexts(results)
+
+    # if len(results) > 0:
+    #     dinoResultsHandler.showImages(queryImage, segImage, kpImage)
+    #     dinoResultsHandler.showTexts(results)
+    # else:
+    #     cv2.imshow("Web Camera",queryImage)
 
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break

@@ -10,7 +10,9 @@ class DinoResultsHandler:
     def showImages(self, queryImage, segImage, kpImage):
 
         # green box
-        (_, cnts, _) = cv2.findContours(segImage.copy(),
+        gray = cv2.cvtColor(segImage,cv2.COLOR_BGR2GRAY)
+        ret,thresh = cv2.threshold(gray,127,255,0)
+        (_, cnts, _) = cv2.findContours(thresh,
                                         cv2.RETR_EXTERNAL,
                                         cv2.CHAIN_APPROX_SIMPLE)
         if len(cnts) > 0:

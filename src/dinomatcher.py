@@ -27,8 +27,8 @@ class DinoMatcher:
             # segmenter = DinoSegmenter2()
             segImage = ColorSegmenter.getMagentaBlob(obj)
 
-            gray = cv2.cvtColor(segImage, cv2.COLOR_BGR2GRAY)
-            (kps, descs) = self.descriptor.describe(gray)
+            # gray = cv2.cvtColor(segImage, cv2.COLOR_BGR2GRAY)
+            (kps, descs) = self.descriptor.describe(segImage)
 
             score = self.match(queryKps, queryDescs, kps, descs)
             results[samplePath] = score
