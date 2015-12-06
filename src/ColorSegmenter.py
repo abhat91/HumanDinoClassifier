@@ -9,9 +9,6 @@ class ColorSegmenter:
     def getMagentaBlob(bgrimg):
         hsvimg = cv2.cvtColor(bgrimg,cv2.COLOR_BGR2HSV)
         blur = cv2.GaussianBlur(hsvimg,(7,7),0)
-
-
-
         # Threshold the HSV image to get only magenta
         mask = cv2.inRange(blur, ColorSegmenter.lower_magenta, ColorSegmenter.upper_magenta)
         mask = cv2.erode(mask,np.ones((2,2),np.uint8),iterations = 3)
