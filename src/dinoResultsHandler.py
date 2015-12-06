@@ -7,7 +7,7 @@ class DinoResultsHandler:
         self.database = database
 
 
-    def showImages(self, queryImage, segImage, kpImage):
+    def drawGreenBox(self, queryImage, segImage, kpImage):
 
         # green box
         gray = cv2.cvtColor(segImage,cv2.COLOR_BGR2GRAY)
@@ -21,10 +21,9 @@ class DinoResultsHandler:
             rect = np.int32(cv2.boxPoints(cv2.minAreaRect(cnt)))
             cv2.drawContours(kpImage, [rect], -1, (0,255,0),2)
 
-        cv2.imshow("Input with Key Points", kpImage)
-        time.sleep(0.50)
-
-
+        return kpImage
+        # cv2.imshow("Input with Key Points", kpImage)
+        time.sleep(0.025)
 
 
     def showTexts(self, matchedResults):

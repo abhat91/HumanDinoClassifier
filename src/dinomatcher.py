@@ -16,9 +16,6 @@ class DinoMatcher:
 
     # now search the thing
     def search(self, queryKps, queryDescs):
-
-
-
         results = {}
 
         for samplePath in self.samplePaths:
