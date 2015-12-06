@@ -17,11 +17,8 @@ ap.add_argument("-d", "--db", required = True, help = "path to the object inform
 ap.add_argument("-s", "--samples", required = True, help = "path to the sample(training) data folder")
 ap.add_argument("-q", "--query", required = True, help = "path to the query image")
 ap.add_argument("-f", "--sift", type = int, default = 0, help = "use SIFT = 1, not use = 0")
-ap.add_argument("-c", "--camera", type = int, default = 1, help = "use camera = 1, use the input query url = 0")
-
 
 args = vars(ap.parse_args())
-
 
 db = {}
 
@@ -32,7 +29,6 @@ useSIFT = args["sift"] > 0
 useHamming = args["sift"] == 0
 ratio = 0.6
 minMatches = 15
-useCam = args["camera"] > 0
 
 if useSIFT:
     minMatches = 50
@@ -41,16 +37,12 @@ descriptor = DinoDescriptor(useSIFT = useSIFT)
 dinoMatcher = DinoMatcher(descriptor, glob.glob(args["samples"] + "/*.png"), ratio = ratio, minMatches = minMatches, useHamming = useHamming)
 dinoResultsHandler = DinoResultsHandler(db)
 
-if useCam is False:
-    queryImage = cv2.imread(args["query"])
-
 # capture from web cam
 cap = cv2.VideoCapture(0)
 while True:
     ret, frame = cap.read()
     if ret == True:
-        if useCam is True:
-            queryImage = utils2.resize(frame, width = 1000)
+        queryImage = utils2.resize(frame, width = 1000)
         # Segment the pink area out
         segImage = ColorSegmenter.getMagentaBlob(queryImage)
         # Describe the query image
@@ -76,11 +68,6 @@ while True:
         # Nicer function, press 'q' to quite the program
         if cv2.waitKey(50) & 0xFF == ord("q"):
             break
-        if useCam is False:
-            cv2.waitKey(0)
-            break
-
-        print(useCam)
     # break when camera is wrong.
     else:
         break

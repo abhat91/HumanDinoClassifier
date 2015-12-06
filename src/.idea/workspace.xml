@@ -29,8 +29,8 @@
       <file leaf-file-name="onlineSearch.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/onlineSearch.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.21538462">
-              <caret line="61" column="13" selection-start-line="61" selection-start-column="13" selection-end-line="61" selection-end-column="13" />
+            <state vertical-scroll-proportion="0.4846154">
+              <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
               </folding>
@@ -92,8 +92,8 @@
         <option value="$PROJECT_DIR$/utils.py" />
         <option value="$PROJECT_DIR$/dinoDescriptor.py" />
         <option value="$PROJECT_DIR$/dinoMatcher.py" />
-        <option value="$PROJECT_DIR$/onlineSearch.py" />
         <option value="$PROJECT_DIR$/dinoResultsHandler.py" />
+        <option value="$PROJECT_DIR$/onlineSearch.py" />
       </list>
     </option>
   </component>
@@ -788,8 +788,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/onlineSearch.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.21538462">
-          <caret line="61" column="13" selection-start-line="61" selection-start-column="13" selection-end-line="61" selection-end-column="13" />
+        <state vertical-scroll-proportion="0.4846154">
+          <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
           </folding>
