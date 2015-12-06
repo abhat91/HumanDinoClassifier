@@ -6,7 +6,6 @@ class DinoResultsHandler:
     def __init__(self, database):
         self.database = database
 
-
     def drawGreenBox(self, queryImage, segImage, kpImage):
 
         # green box
@@ -22,15 +21,13 @@ class DinoResultsHandler:
             cv2.drawContours(kpImage, [rect], -1, (0,255,0),2)
 
         return kpImage
-        # cv2.imshow("Input with Key Points", kpImage)
-        time.sleep(0.025)
 
 
     def showTexts(self, matchedResults):
 
         if len(matchedResults) == 0:
             print("no sample are matched to the query !")
-            cv2.waitKey(30)
+
 
         else:
             for(i, (score, samplePath)) in enumerate(matchedResults):

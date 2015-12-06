@@ -17,7 +17,7 @@ ap.add_argument("-d", "--db", required = True, help = "path to the object inform
 ap.add_argument("-s", "--samples", required = True, help = "path to the sample(training) data folder")
 ap.add_argument("-q", "--query", required = True, help = "path to the query image")
 ap.add_argument("-f", "--sift", type = int, default = 0, help = "use SIFT = 1, not use = 0")
-ap.add_argument("-c", "--camera", type = int, default = 0, help = "use camera = 1, use the input query url = 0")
+ap.add_argument("-c", "--camera", type = int, default = 1, help = "use camera = 1, use the input query url = 0")
 
 
 args = vars(ap.parse_args())
