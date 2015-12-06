@@ -39,8 +39,14 @@ class BlobDetector:
         self.blobDetect()
 
 
-def normalized(img):
-    return img
+def normalized(b,g,r):
+    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(3,3))
+    #b,g,r = cv2.split(img)
+    b1 = clahe.apply(b)
+    g1 = clahe.apply(g)
+    r1 = clahe.apply(r)
+    #bgr = cv2.merge((b1,g1,r1))
+    return b1,g1,r1
 
 def getBlob(image):
     blob_detect=BlobDetector()
@@ -65,7 +71,7 @@ def nothing(x):
     pass
 ################################################################################
 #Preprocessing stuff
-cv2.namedWindow('cannyOutput')
+#cv2.namedWindow('cannyOutput')
 ################################################################################
 
 c = cv2.VideoCapture(0)
@@ -82,6 +88,7 @@ while True:
     nb=np.minimum(image_nobackground, b)
     ng=np.minimum(image_nobackground, g)
     nr=np.minimum(image_nobackground, r)
+    bn,gn,rn = normalized(ng,nr,ng)
     backgroundRemovedImage=cv2.merge((nb, ng, nr))
 
     res = ColorSegmenter.getMagentaBlob(backgroundRemovedImage)
@@ -117,17 +124,19 @@ while True:
         #Only if there are 2 contours or something
         area = cv2.contourArea(cntforhull)
         areaWithHull=areaWithHull+[area]
-        if len(areaContours)>0:
-            if max(areaWithHull)>500:
-                ratioOfAreas=max(areaContours,key=itemgetter(1))[0]/float(max(areaWithHull))
-                if ratioOfAreas>0.5 and ratioOfAreas<0.65:
-                    cv2.putText(res, 'It is a T-Rex', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255))
-                elif ratioOfAreas>0.70 and ratioOfAreas<0.75:
-                    cv2.putText(res, 'Its a Stegosaurus', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255))
-                elif ratioOfAreas>0.75 and ratioOfAreas<0.84:
-                    cv2.putText(res, 'Its a Triceratops', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255))
-                elif ratioOfAreas>0.86:
-                    cv2.putText(res, 'It was a volcano', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255))
+    if len(areaContours)>0:
+        if max(areaWithHull)>500:
+            ratioOfAreas=max(areaContours,key=itemgetter(1))[0]/float(max(areaWithHull))
+            cv2.putText(res,"{:0.2f}".format(ratioOfAreas), (0, res.shape[0]-80), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
+
+            if ratioOfAreas>0.5 and ratioOfAreas<0.65:
+                cv2.putText(res,'It is a T-Rex', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
+            elif ratioOfAreas>0.70 and ratioOfAreas<0.77:
+                cv2.putText(res, 'Its a Stegosaurus', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
+            elif ratioOfAreas>0.78 and ratioOfAreas<0.84:
+                cv2.putText(res, 'Its a Triceratops', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
+            elif ratioOfAreas>0.86:
+                cv2.putText(res, 'It was a volcano', (0, res.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
     ret, __thresh = cv2.threshold(res, 127, 255,0)
     cv2.imshow('Output',res)
     k = cv2.waitKey(20)
