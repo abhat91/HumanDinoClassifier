@@ -27,7 +27,7 @@ for line in csv.reader(open(args["db"])):
 
 useSIFT = args["sift"] > 0
 useHamming = args["sift"] == 0
-ratio = 0.6
+ratio = 0.7
 minMatches = 15
 
 if useSIFT:

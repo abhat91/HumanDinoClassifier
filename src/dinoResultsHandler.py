@@ -6,7 +6,6 @@ class DinoResultsHandler:
         self.database = database
 
     def drawGreenBox(self, queryImage, segImage, kpImage):
-
         # green box
         gray = cv2.cvtColor(segImage,cv2.COLOR_BGR2GRAY)
         ret,thresh = cv2.threshold(gray,127,255,0)
@@ -21,13 +20,10 @@ class DinoResultsHandler:
 
         return kpImage
 
-
     def showTexts(self, matchedResults):
 
         if len(matchedResults) == 0:
             print("No samples are matched to the query !")
-
-
         else:
             for(i, (score, samplePath)) in enumerate(matchedResults):
                 description = self.database[samplePath[samplePath.rfind("/") + 1:]]
@@ -35,3 +31,4 @@ class DinoResultsHandler:
 
                 results = cv2.imread(samplePath) # only show the highest matching image
                 cv2.imshow("Right: Matched Sample", results)
+                cv2.waitKey(5000)
