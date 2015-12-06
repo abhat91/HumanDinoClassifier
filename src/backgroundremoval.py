@@ -23,7 +23,7 @@ class BackgroundRemoval:
 
     @staticmethod
     def removebackground(gray, background):
-        imgs=cv2.bitwise_not(cv2.bitwise_and(gray, background))
+        imgs=cv2.absdiff(gray, background)
         imgs=cv2.morphologyEx(imgs, cv2.MORPH_CLOSE, np.ones((2,2), np.uint8))
         (thresh, im_bw) = cv2.threshold(imgs, 25, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
         return im_bw
