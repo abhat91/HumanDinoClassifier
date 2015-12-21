@@ -38,15 +38,14 @@ _,f = c.read()
 gray=cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
 while True:
     _,f = c.read()
-    gray=cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
     # Remove fixed background from image
-    image_nobackground=BackgroundRemoval.removebackground(gray, background)
+    mask=BackgroundRemoval.removebackground(f, background)
     #split channels to remove backround and normalize color
     b,g,r = cv2.split(f)
     # remove background
-    nb=np.minimum(image_nobackground, b)
-    ng=np.minimum(image_nobackground, g)
-    nr=np.minimum(image_nobackground, r)
+    nb=np.minimum(mask, b)
+    ng=np.minimum(mask, g)
+    nr=np.minimum(mask, r)
 
     # normalize color
     bn,gn,rn = normalized(ng,nr,ng)
