@@ -43,7 +43,8 @@ class DinoMatcher:
 
         for m in rawMatches:
             if len(m) == 2 and m[0].distance < m[1].distance * self.ratio:
-                matches.append((m[0].trainIdx, m[0].queryIdx)) #be careful with the train/query orders, I'm not sure
+                #be careful with the train/query orders
+                matches.append((m[0].trainIdx, m[0].queryIdx)) 
 
         # Test  Info
         print("{}: {}".format("Current matches: ", len(matches)))
@@ -52,7 +53,7 @@ class DinoMatcher:
             ptsA = np.float32([kpsA[i] for (i, _) in matches])
             ptsB = np.float32([kpsB[j] for (_, j) in matches])
             (_, status) = cv2.findHomography(ptsA, ptsB, cv2.RANSAC, 4.0)
-
-            return float(status.sum()) / status.size # matching ratio against the object in samplebase
+            # matching ratio against the object in samplebase
+            return float(status.sum()) / status.size 
 
         return -1.0 # no possible match
